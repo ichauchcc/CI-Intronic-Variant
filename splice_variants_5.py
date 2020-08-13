@@ -196,8 +196,6 @@ def main():
 # =============================================================================
     
     ref = genome_ref(chr_pos,g,strand)
-    matrix3 = load_matrix3()
-    matrix5 = load_matrix(5)
     
     if strand == '-':
         complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
@@ -284,7 +282,7 @@ if __name__=="__main__":
     from Bio.Seq import Seq
     from maxentpy import maxent
     from maxentpy import maxent_fast
-    from maxentpy.maxent_fast import load_matrix
+    from maxentpy.maxent import load_matrix5, load_matrix3
     
     #Install reference genome
     #genomepy.install_genome('hg19', 'UCSC')
@@ -293,6 +291,9 @@ if __name__=="__main__":
     ## fasta: /Users/yuchen/.local/share/genomes/hg19/hg19.fa
     ## Created config file /Users/yuchen/Library/Application Support/genomepy/genomepy.yaml
     g = genomepy.Genome('hg19',r"/Users/yuchen/.local/share/genomes")
+    
+    matrix3 = load_matrix3()
+    matrix5 = load_matrix5()
 
     #main function
     main() 
