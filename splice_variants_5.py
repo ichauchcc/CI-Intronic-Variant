@@ -114,12 +114,12 @@ def splice_search(win_seq,var_pos,strand,ref,win_width):
             if win_seq[base].upper() == 'G':
                 if win_seq[base-1].upper() == 'A':
                     potential_seq = str(win_seq[base-19:base+4])
-                    maxentscore_pot = maxent.score3(potential_seq)
+                    maxentscore_pot = maxent_fast.score3(potential_seq, matrix=matrix3)
                     if maxentscore_pot > 2:
                         splice_dict[potential_seq] = {'Nature':'Acceptor','Start':var_pos-30+base-19,'End':var_pos-30+base+4, 'MaxEntScore':maxentscore_pot}
                 if win_seq[base+1].upper() == 'T':
                     potential_seq = str(win_seq[base-3:base+6])
-                    maxentscore_pot = maxent.score5(potential_seq)
+                    maxentscore_pot = maxent_fast.score5(potential_seq, matrix=matrix5)
                     if maxentscore_pot > 2:
                         splice_dict[potential_seq] = {'Nature':'Donor','Start':var_pos-30+base-3,'End':var_pos-30+base+6, 'MaxEntScore':maxentscore_pot}
     
@@ -128,12 +128,12 @@ def splice_search(win_seq,var_pos,strand,ref,win_width):
             if win_seq[base].upper() == 'G':
                 if win_seq[base-1].upper() == 'A':
                     potential_seq = str(win_seq[base-19:base+4])
-                    maxentscore_pot = maxent.score3(potential_seq)
+                    maxentscore_pot = maxent_fast.score3(potential_seq, matrix=matrix3)
                     if maxentscore_pot > 2:
                         splice_dict[potential_seq] = {'Nature':'Acceptor','Start':(len(ref)-var_pos)+win_width-(base-25)+19,'End':(len(ref)-var_pos)+5-(base-25)-3, 'MaxEntScore':maxentscore_pot}
                 if win_seq[base+1].upper() == 'T':
                     potential_seq = str(win_seq[base-3:base+6])
-                    maxentscore_pot = maxent.score5(potential_seq)
+                    maxentscore_pot = maxent_fast.score5(potential_seq, matrix=matrix5)
                     if maxentscore_pot > 2:
                         splice_dict[potential_seq] = {'Nature':'Donor','Start':(len(ref)-var_pos)+win_width-(base-25)+3,'End':(len(ref)-var_pos)+5-(base-25)-5, 'MaxEntScore':maxentscore_pot}
     return splice_dict
@@ -196,6 +196,8 @@ def main():
 # =============================================================================
     
     ref = genome_ref(chr_pos,g,strand)
+    matrix3 = load_matrix3()
+    matrix5 = load_matrix(5)
     
     if strand == '-':
         complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
@@ -218,9 +220,9 @@ def main():
 #     print(len(seq_res), len(ref_seq))
 # =============================================================================
     if type_res.upper() == 'DONOR':
-        maxentscore_var = maxent.score5(seq_res)
+        maxentscore_var = maxent_fast.score5(seq_res, matrix=matrix5)
         if maxentscore_var >= 5:
-            maxentscore_ref = maxent.score5(ref_seq)
+            maxentscore_ref = maxent_fast.score5(ref_seq, matrix=matrix5)
             maxent_diff = maxentscore_var - maxentscore_ref
             if maxent_diff >= 3:
                 print(type_res, maxentscore_var, seq_res)
@@ -229,9 +231,9 @@ def main():
         else:
             print('This variant is not potential splice donor site.')
     else:
-        maxentscore_var = maxent.score3(seq_res)
+        maxentscore_var = maxent_fast.score3(seq_res, matrix=matrix3)
         if maxentscore_var >= 5:
-            maxentscore_ref = maxent.score3(ref_seq)
+            maxentscore_ref = maxent_fast.score3(ref_seq, matrix=matrix3)
             maxent_diff = maxentscore_var - maxentscore_ref
             if maxent_diff >= 3:
                 print(type_res, maxentscore_var, seq_res)
@@ -249,11 +251,11 @@ def main():
         #if str(seq) == 'CTCTACCCTCTTCTGAAAAGAAA':
         #    print('yes')
         if len(seq) <= 15:
-            maxentscore_1 = maxent.score5(str(seq))
+            maxentscore_1 = maxent_fast.score5(str(seq), matrix=matrix5)
             if maxentscore_1 >= 2:
                 print(seq, maxentscore_1, adj_var_dict[seq])
         else:
-            maxentscore_1 = maxent.score3(str(seq))
+            maxentscore_1 = maxent_fast.score3(str(seq), matrix=matrix3)
             if maxentscore_1 >= 2:
                 print(seq, maxentscore_1, adj_var_dict[seq])
         
@@ -281,6 +283,8 @@ if __name__=="__main__":
     # package name Biopython
     from Bio.Seq import Seq
     from maxentpy import maxent
+    from maxentpy import maxent_fast
+    from maxentpy.maxent_fast import load_matrix
     
     #Install reference genome
     #genomepy.install_genome('hg19', 'UCSC')
